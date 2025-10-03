@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraduLibras - Reconhecimento</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg-gradient: linear-gradient(135deg, #6366f1, #818cf8);
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            padding: 1rem 0;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .logo-container:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-text {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            background: var(--bg-gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            margin-left: 3rem;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-right: 1rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-top: 2px;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .camera-section {
+            background: var(--surface);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            height: fit-content;
+        }
+
+        .camera-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--bg-gradient);
+        }
+
+        .camera-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .camera-header svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            color: var(--primary);
+        }
+
+        #camera-feed {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin: 0 auto;
+            display: block;
+        }
+
+        #camera-feed:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        .text-section {
+            background: var(--surface);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .text-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--bg-gradient);
+        }
+
+        .letra-display {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(129, 140, 248, 0.1));
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .letra-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .letra-display:hover::before {
+            left: 100%;
+        }
+
+        .letra-display:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .letra-display h2 {
+            color: var(--text);
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .letra-display h2 svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: var(--primary);
+        }
+
+        .letra-atual {
+            color: var(--primary);
+            font-size: 4rem;
+            font-weight: 700;
+            text-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+            animation: pulse 2s infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        .letra-atual.typing {
+            animation: typing 0.5s ease-in-out;
+        }
+
+        .letra-atual.detected {
+            animation: letterDetected 1.5s ease-in-out;
+        }
+
+        .letra-display.detected {
+            animation: containerDetected 1.5s ease-in-out;
+        }
+
+        @keyframes typing {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes letterDetected {
+            0% { 
+                transform: scale(1); 
+                color: var(--primary);
+                text-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+            }
+            25% { 
+                transform: scale(1.3); 
+                color: #10b981;
+                text-shadow: 0 8px 16px rgba(16, 185, 129, 0.6);
+            }
+            50% { 
+                transform: scale(1.2); 
+                color: #f59e0b;
+                text-shadow: 0 6px 12px rgba(245, 158, 11, 0.5);
+            }
+            75% { 
+                transform: scale(1.1); 
+                color: #ef4444;
+                text-shadow: 0 4px 8px rgba(239, 68, 68, 0.4);
+            }
+            100% { 
+                transform: scale(1); 
+                color: var(--primary);
+                text-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+            }
+        }
+
+        @keyframes containerDetected {
+            0% { 
+                border-color: rgba(99, 102, 241, 0.3);
+                box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+            }
+            25% { 
+                border-color: rgba(16, 185, 129, 0.6);
+                box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+            }
+            50% { 
+                border-color: rgba(245, 158, 11, 0.6);
+                box-shadow: 0 10px 28px rgba(245, 158, 11, 0.4);
+            }
+            75% { 
+                border-color: rgba(239, 68, 68, 0.6);
+                box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+            }
+            100% { 
+                border-color: rgba(99, 102, 241, 0.3);
+                box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+            }
+        }
+
+        .text-display-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .text-item {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            border: 2px solid rgba(99, 102, 241, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .text-item:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .text-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--bg-gradient);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .text-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .texto-acumulado {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 500;
+            min-height: 2.5rem;
+            line-height: 1.6;
+            padding: 0.75rem;
+            background: rgba(99, 102, 241, 0.05);
+            border-radius: 0.75rem;
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .texto-acumulado:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .text-corrected {
+            color: #10b981;
+            font-size: 1.5rem;
+            font-weight: 500;
+            min-height: 2.5rem;
+            line-height: 1.6;
+            padding: 0.75rem;
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 0.75rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .text-corrected.updated {
+            animation: highlight 0.6s ease-in-out;
+        }
+
+        @keyframes highlight {
+            0% { background: rgba(16, 185, 129, 0.1); }
+            50% { background: rgba(16, 185, 129, 0.2); }
+            100% { background: rgba(16, 185, 129, 0.05); }
+        }
+
+        .text-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .text-label svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: var(--primary);
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .status-indicator::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.offline {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .status-indicator.offline::before {
+            background: #ef4444;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .button {
+            padding: 0.875rem 1.5rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .button:hover::after {
+            opacity: 1;
+        }
+
+        .button-primary {
+            background: var(--bg-gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .button-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .button-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .button-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--border);
+        }
+
+        .button-secondary:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+        }
+
+        .button-secondary:active {
+            transform: translateY(-1px);
+        }
+
+        .button-accent {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: 2px solid #f59e0b;
+        }
+
+        .button-accent:hover {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            border-color: #d97706;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+        }
+
+        .button-accent:active {
+            transform: translateY(-1px);
+        }
+
+        .button-info {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: 2px solid #3b82f6;
+        }
+
+        .button-info:hover {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            border-color: #1d4ed8;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .button-info:active {
+            transform: translateY(-1px);
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+
+
+        .button svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            transition: transform 0.3s ease;
+        }
+
+        .button:hover svg {
+            transform: scale(1.1);
+        }
+
+        .button:active svg {
+            transform: scale(0.95);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 2rem;
+        }
+
+        .footer span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--surface);
+            border-radius: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .heart {
+            color: #ef4444;
+            font-size: 1.25rem;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes slideInFromLeft {
+            0% { transform: translateX(-100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromRight {
+            0% { transform: translateX(100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            0% { transform: translateY(30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .camera-section {
+            animation: slideInFromLeft 0.8s ease-out;
+        }
+
+        .text-section {
+            animation: slideInFromRight 0.8s ease-out;
+        }
+
+        .letra-display, .text-item {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .button {
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        .button:hover {
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        .status-indicator {
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        /* Efeito de ondas para a câmera */
+        .camera-section::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: ripple 2s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            0% {
+                width: 100px;
+                height: 100px;
+                opacity: 1;
+            }
+            100% {
+                width: 300px;
+                height: 300px;
+                opacity: 0;
+            }
+        }
+
+        /* Efeito de brilho pulsante */
+        .letra-display::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Efeito de hover dinâmico para cards */
+        .text-item:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animação de entrada escalonada */
+        .text-item:nth-child(1) { animation-delay: 0.1s; }
+        .text-item:nth-child(2) { animation-delay: 0.2s; }
+        .button:nth-child(1) { animation-delay: 0.1s; }
+        .button:nth-child(2) { animation-delay: 0.2s; }
+        .button:nth-child(3) { animation-delay: 0.3s; }
+        .button:nth-child(4) { animation-delay: 0.4s; }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            #camera-feed {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .nav-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                margin-left: 0;
+            }
+
+            .controls, .button-group {
+                flex-direction: column;
+            }
+
+            .button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .main-container {
+                padding: 0 0.5rem;
+            }
+
+            .camera-section, .text-section {
+                padding: 1rem;
+            }
+
+            .letra-atual {
+                font-size: 3rem;
+            }
+
+            .texto-acumulado, .text-corrected {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="/" class="logo-container">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#6366f1" stroke-width="2"/>
+                        <path d="M7 11.5V14.5C7 15.8807 8.11929 17 9.5 17C10.8807 17 12 15.8807 12 14.5V11.5M12 11.5V7.5C12 6.11929 13.1193 5 14.5 5C15.8807 5 17 6.11929 17 7.5V11.5M12 11.5V14.5C12 15.8807 13.1193 17 14.5 17C15.8807 17 17 15.8807 17 14.5V11.5M17 11.5V7.5" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span class="logo-text">TraduLibras</span>
+                </a>
+                <div class="nav-links">
+                    <a href="/" class="nav-link">Início</a>
+                    <a href="/camera" class="nav-link active">Câmera</a>
+                    <a href="/tutorial" class="nav-link">Tutorial</a>
+                    {% if current_user.is_authenticated %}
+                        <div class="user-info">
+                            <span class="user-name">{{ current_user.username }}</span>
+                            <span class="user-role">{{ current_user.role.upper() }}</span>
+                        </div>
+                        {% if current_user.is_admin() %}
+                            <a href="/admin" class="nav-link">Admin</a>
+                        {% endif %}
+                        <a href="/logout" class="logout-btn">Sair</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="main-container">
+            <!-- Seção da Câmera -->
+            <div class="camera-section">
+                <div class="camera-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Câmera ao Vivo
+                </div>
+            <img id="camera-feed" src="{{ url_for('video_feed') }}" alt="Camera Feed">
+            
+            <div class="letra-display">
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                        </svg>
+                        Letra Detectada
+                    </h2>
+                <div class="letra-atual" id="letra">-</div>
+            </div>
+
+                <!-- Controles removidos - interface limpa -->
+            </div>
+
+            <!-- Seção de Texto -->
+            <div class="text-section">
+                <div class="status-indicator" id="status-indicator">
+                    Sistema Ativo
+                </div>
+                
+                <h2 style="color: var(--text); font-size: 1.25rem; margin-bottom: 1.5rem; font-weight: 600;">
+                    Texto Formado
+                </h2>
+
+                <div class="text-display-group">
+                    <div class="text-item">
+                        <div class="text-label">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Texto Original
+                        </div>
+                        <div class="texto-acumulado" id="texto"></div>
+                    </div>
+                    
+                    <!-- Campo de correção removido - interface simplificada -->
+                </div>
+
+                <div class="button-group">
+                    <button class="button button-primary" onclick="falarTexto()">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        </svg>
+                        Reproduzir Texto
+                    </button>
+                    <button class="button button-accent" onclick="limparUltimaLetra()">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Limpar Última Letra
+                    </button>
+                    <button class="button button-secondary" onclick="limparTexto()">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Limpar Texto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let letraAtual = "";
+        let textoAcumulado = "";
+        let contadorCorrecoes = 0;
+
+        function corrigirTexto(texto) {
+            // Dicionário de palavras comuns em português brasileiro
+            const dicionario = [
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                'OLA', 'OI', 'BOM', 'DIA', 'TARDE', 'NOITE', 'OBRIGADO', 'POR', 'FAVOR', 'DESCULPA', 'COM', 'LICENCA',
+                'SIM', 'NAO', 'TALVEZ', 'QUEM', 'QUE', 'ONDE', 'QUANDO', 'COMO', 'PORQUE', 'PARA', 'COM', 'SEM',
+                'EU', 'VOCE', 'ELE', 'ELA', 'NOS', 'VOCES', 'ELES', 'ELAS', 'MEU', 'MINHA', 'SEU', 'SUA', 'NOSSO', 'NOSSA',
+                'TRADULIBRAS', 'LIBRAS', 'SURDO', 'SURDA', 'OUVIDO', 'FALA', 'GESTO', 'SINAL', 'COMUNICACAO',
+                'AGUA', 'COMIDA', 'CASA', 'FAMILIA', 'AMIGO', 'AMIGA', 'TRABALHO', 'ESCOLA', 'HOSPITAL', 'LOJA',
+                'CARRO', 'ONIBUS', 'AVIAO', 'TREM', 'BICICLETA', 'PES', 'MAOS', 'CABECA', 'OLHOS', 'BOCA',
+                'VERMELHO', 'AZUL', 'VERDE', 'AMARELO', 'PRETO', 'BRANCO', 'ROSA', 'ROXO', 'LARANJA', 'MARROM',
+                'UM', 'DOIS', 'TRES', 'QUATRO', 'CINCO', 'SEIS', 'SETE', 'OITO', 'NOVE', 'DEZ'
+            ];
+
+            // Função para calcular a distância de Levenshtein entre duas strings
+            function levenshteinDistance(a, b) {
+                if (a.length === 0) return b.length;
+                if (b.length === 0) return a.length;
+
+                const matrix = [];
+                for (let i = 0; i <= b.length; i++) {
+                    matrix[i] = [i];
+                }
+                for (let j = 0; j <= a.length; j++) {
+                    matrix[0][j] = j;
+                }
+                for (let i = 1; i <= b.length; i++) {
+                    for (let j = 1; j <= a.length; j++) {
+                        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                            matrix[i][j] = matrix[i - 1][j - 1];
+                        } else {
+                            matrix[i][j] = Math.min(
+                                matrix[i - 1][j - 1] + 1,
+                                matrix[i][j - 1] + 1,
+                                matrix[i - 1][j] + 1
+                            );
+                        }
+                    }
+                }
+                return matrix[b.length][a.length];
+            }
+
+            // Função para encontrar a melhor correção para uma palavra
+            function encontrarMelhorCorrecao(palavra) {
+                const palavraUpper = palavra.toUpperCase();
+                
+                // Se a palavra já está no dicionário, retorna ela
+                if (dicionario.includes(palavraUpper)) {
+                    return palavraUpper;
+                }
+
+                let melhorCorrecao = palavra;
+                let menorDistancia = Infinity;
+
+                // Procura a palavra mais similar no dicionário
+                for (const palavraDicionario of dicionario) {
+                    const distancia = levenshteinDistance(palavraUpper, palavraDicionario);
+                    
+                    // Se a distância for menor e a palavra tiver tamanho similar
+                    if (distancia < menorDistancia && 
+                        distancia <= Math.max(2, Math.floor(palavraUpper.length / 3)) &&
+                        Math.abs(palavraUpper.length - palavraDicionario.length) <= 2) {
+                        menorDistancia = distancia;
+                        melhorCorrecao = palavraDicionario;
+                    }
+                }
+
+                // Se não encontrou uma correção boa, retorna a palavra original
+                if (menorDistancia > Math.max(2, Math.floor(palavraUpper.length / 3))) {
+                return palavra;
+                }
+
+                return melhorCorrecao;
+            }
+
+            // Função para corrigir sequências de letras que podem formar palavras
+            function corrigirSequencias(texto) {
+                // Remove espaços e converte para maiúsculo
+                const textoLimpo = texto.replace(/\s+/g, '').toUpperCase();
+                let resultado = '';
+                let i = 0;
+
+                while (i < textoLimpo.length) {
+                    let melhorPalavra = textoLimpo[i];
+                    let melhorScore = 0;
+
+                    // Tenta formar palavras de 2 a 8 caracteres
+                    for (let tamanho = 2; tamanho <= Math.min(8, textoLimpo.length - i); tamanho++) {
+                        const subsequencia = textoLimpo.substring(i, i + tamanho);
+                        const correcao = encontrarMelhorCorrecao(subsequencia);
+                        
+                        // Calcula um score baseado na similaridade
+                        const distancia = levenshteinDistance(subsequencia, correcao);
+                        const score = (subsequencia.length - distancia) / subsequencia.length;
+                        
+                        if (score > melhorScore && score > 0.6) {
+                            melhorScore = score;
+                            melhorPalavra = correcao;
+                        }
+                    }
+
+                    // Se encontrou uma palavra boa, adiciona ela
+                    if (melhorPalavra.length > 1) {
+                        resultado += melhorPalavra + ' ';
+                        i += melhorPalavra.length;
+                    } else {
+                        resultado += textoLimpo[i] + ' ';
+                        i++;
+                    }
+                }
+
+                return resultado.trim();
+            }
+
+            // Função para aplicar correções baseadas em padrões comuns
+            function aplicarCorrecoesPadrao(texto) {
+                let textoCorrigido = texto.toUpperCase();
+                
+                // Padrões comuns de confusão entre letras similares
+                const padroesCorrecao = {
+                    // Letras que podem ser confundidas
+                    '0': 'O', '1': 'I', '5': 'S', '8': 'B',
+                    'I1': 'II', 'O0': 'OO', 'S5': 'SS', 'B8': 'BB',
+                    
+                    // Palavras comuns que podem ser mal reconhecidas
+                    'TRADULIBRAS': 'TRADULIBRAS',
+                    'LIBRAS': 'LIBRAS',
+                    'OLA': 'OLA',
+                    'OI': 'OI',
+                    'BOM': 'BOM',
+                    'DIA': 'DIA',
+                    'NOITE': 'NOITE',
+                    'OBRIGADO': 'OBRIGADO',
+                    'POR': 'POR',
+                    'FAVOR': 'FAVOR',
+                    'SIM': 'SIM',
+                    'NAO': 'NAO',
+                    'EU': 'EU',
+                    'VOCE': 'VOCE',
+                    'ELE': 'ELE',
+                    'ELA': 'ELA',
+                    'AGUA': 'AGUA',
+                    'CASA': 'CASA',
+                    'FAMILIA': 'FAMILIA',
+                    'AMIGO': 'AMIGO',
+                    'AMIGA': 'AMIGA',
+                    'CARRO': 'CARRO',
+                    'VERMELHO': 'VERMELHO',
+                    'AZUL': 'AZUL',
+                    'VERDE': 'VERDE',
+                    'AMARELO': 'AMARELO',
+                    'PRETO': 'PRETO',
+                    'BRANCO': 'BRANCO'
+                };
+
+                // Aplica correções de padrões
+                for (const [padrao, correcao] of Object.entries(padroesCorrecao)) {
+                    const regex = new RegExp(padrao, 'gi');
+                    textoCorrigido = textoCorrigido.replace(regex, correcao);
+                }
+
+                return textoCorrigido;
+            }
+
+            // Aplica a correção
+            if (!texto || texto.trim() === '') {
+                return '';
+            }
+
+            // Primeiro, aplica correções de padrões
+            const textoComPadroes = aplicarCorrecoesPadrao(texto);
+            
+            // Depois, tenta corrigir sequências de letras
+            const textoCorrigido = corrigirSequencias(textoComPadroes);
+            
+            // Se o resultado for muito diferente do original, retorna o original
+            if (textoCorrigido.length < texto.length * 0.3) {
+                return texto;
+            }
+
+            return textoCorrigido;
+        }
+
+        function atualizarLetra() {
+            fetch('/letra_atual')
+                .then(response => response.json())
+                .then(data => {
+                    // Sempre atualiza o display, mesmo se a letra não mudou
+                    const letraElement = document.getElementById('letra');
+                    const letraDisplay = document.querySelector('.letra-display');
+                    
+                    // Garante que sempre mostra hífen quando não há letra
+                    const letraParaMostrar = (data.letra && data.letra.trim() !== '') ? data.letra : '-';
+                    letraElement.textContent = letraParaMostrar;
+                    
+                    // Sempre atualiza o texto do servidor
+                    textoAcumulado = data.texto || '';
+                    document.getElementById('texto').textContent = textoAcumulado;
+                    
+                    // Só processa animações se a letra realmente mudou
+                    if (data.letra !== letraAtual) {
+                        letraAtual = data.letra;
+                        
+                        // Adicionar animação de digitação e detecção
+                        if (letraAtual && letraAtual !== '-' && letraAtual.trim() !== '') {
+                            // Animação de digitação
+                            letraElement.classList.add('typing');
+                            setTimeout(() => {
+                                letraElement.classList.remove('typing');
+                            }, 500);
+                            
+                            // Animação de detecção
+                            if (data.detectada) {
+                                letraElement.classList.add('detected');
+                                letraDisplay.classList.add('detected');
+                                
+                                setTimeout(() => {
+                                    letraElement.classList.remove('detected');
+                                    letraDisplay.classList.remove('detected');
+                                }, 1500);
+                                
+                                // Reset da flag de detecção
+                                fetch('/reset_detection');
+                            }
+                            
+                            // Atualiza o texto corrigido com animação
+                            const textoCorrigido = corrigirTexto(textoAcumulado);
+                            const textoCorrigidoElement = document.getElementById('texto-corrigido');
+                            
+                            // Mostra a diferença visualmente
+                            if (textoCorrigido !== textoAcumulado) {
+                                textoCorrigidoElement.innerHTML = `<span style="color: #10b981; font-weight: 600;">${textoCorrigido}</span>`;
+                                textoCorrigidoElement.title = `Corrigido de: ${textoAcumulado}`;
+                                contadorCorrecoes++;
+                                document.getElementById('contador-correcoes').textContent = contadorCorrecoes;
+                            } else {
+                                textoCorrigidoElement.textContent = textoCorrigido;
+                                textoCorrigidoElement.title = 'Texto sem correções necessárias';
+                            }
+                            
+                            textoCorrigidoElement.classList.add('updated');
+                            setTimeout(() => {
+                                textoCorrigidoElement.classList.remove('updated');
+                            }, 600);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao atualizar letra:', error);
+                    updateStatusIndicator(false);
+                });
+        }
+
+        function updateStatusIndicator(isOnline) {
+            const statusElement = document.getElementById('status-indicator');
+            if (isOnline) {
+                statusElement.textContent = 'Sistema Online';
+                statusElement.className = 'status-indicator';
+            } else {
+                statusElement.textContent = 'Sistema Offline';
+                statusElement.className = 'status-indicator offline';
+            }
+        }
+
+        function falarTexto() {
+            const textoAtual = document.getElementById('texto').textContent;
+            if (!textoAtual || textoAtual.trim() === '') {
+                alert('Não há texto para reproduzir!');
+                return;
+            }
+
+            // Efeito visual do botão
+            const button = event.target.closest('.button');
+            button.style.animation = 'bounce 0.6s ease-in-out';
+
+            fetch('/falar_texto', {
+                method: 'GET'
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    throw new Error('Erro na requisição');
+                }
+            })
+            .then(audioBlob => {
+                // Criar URL do áudio
+                const audioUrl = URL.createObjectURL(audioBlob);
+                
+                // Criar e reproduzir áudio
+                const audio = new Audio(audioUrl);
+                audio.play();
+                
+                // Limpar URL após reprodução
+                audio.onended = () => {
+                    URL.revokeObjectURL(audioUrl);
+                    console.log('✅ Áudio reproduzido com sucesso');
+                };
+                
+                // Tratar erros de áudio
+                audio.onerror = () => {
+                    URL.revokeObjectURL(audioUrl);
+                    console.error('❌ Erro na reprodução do áudio');
+                };
+            })
+            .catch(error => {
+                console.error('❌ Erro na requisição:', error);
+                alert('Erro ao reproduzir áudio!');
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    button.style.animation = '';
+                }, 600);
+            });
+        }
+
+        // Função falarLetra removida - interface simplificada
+
+        function limparTexto() {
+            // Limpar no servidor
+            fetch('/limpar_texto')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Limpar variáveis locais
+                        textoAcumulado = "";
+                        letraAtual = "";
+                        
+                        // Limpar elementos da interface
+                        document.getElementById('texto').textContent = textoAcumulado;
+                        document.getElementById('texto-corrigido').textContent = "";
+                        document.getElementById('texto-corrigido').title = '';
+                        
+                        // Limpar a letra detectada
+                        const letraElement = document.getElementById('letra');
+                        if (letraElement) {
+                            letraElement.textContent = '-';
+                        }
+                        
+                        // Adicionar animação de limpeza
+                        const textElements = document.querySelectorAll('.texto-acumulado, .text-corrected');
+                        textElements.forEach(element => {
+                            element.style.opacity = '0.5';
+                            setTimeout(() => {
+                                element.style.opacity = '1';
+                            }, 200);
+                        });
+                        
+                        console.log('Texto limpo com sucesso');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao limpar texto:', error);
+                    // Fallback: limpar apenas no frontend
+                    textoAcumulado = "";
+                    letraAtual = "";
+                    contadorCorrecoes = 0;
+                    document.getElementById('texto').textContent = textoAcumulado;
+                    document.getElementById('texto-corrigido').textContent = "";
+                    document.getElementById('texto-corrigido').title = '';
+                    document.getElementById('contador-correcoes').textContent = '0';
+                    
+                    const letraElement = document.getElementById('letra');
+                    if (letraElement) {
+                        letraElement.textContent = '-';
+                    }
+                });
+        }
+
+        function limparUltimaLetra() {
+            if (!textoAcumulado || textoAcumulado.length === 0) {
+                alert('Não há texto para limpar!');
+                return;
+            }
+
+            fetch('/limpar_ultima_letra', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    textoAcumulado = data.texto;
+                    letraAtual = "";
+                    
+                    // Atualizar interface
+                    document.getElementById('texto').textContent = textoAcumulado;
+                    document.getElementById('letra').textContent = '-';
+                    
+                    // Efeito visual
+                    const textoElement = document.getElementById('texto');
+                    textoElement.style.animation = 'shake 0.5s ease-in-out';
+                    setTimeout(() => {
+                        textoElement.style.animation = '';
+                    }, 500);
+                    
+                    console.log('Última letra removida com sucesso');
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao limpar última letra:', error);
+                // Fallback: limpar apenas no frontend
+                if (textoAcumulado.length > 0) {
+                    textoAcumulado = textoAcumulado.slice(0, -1);
+                    letraAtual = "";
+                    document.getElementById('texto').textContent = textoAcumulado;
+                    document.getElementById('letra').textContent = '-';
+                }
+            });
+        }
+
+        // Função de correção removida - interface simplificada
+
+        // Funções desnecessárias removidas - interface simplificada
+
+        // Verificar status do sistema
+        function checkSystemStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    updateStatusIndicator(data.status === 'online');
+                })
+                .catch(() => {
+                    updateStatusIndicator(false);
+                });
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Garantir que o hífen seja mostrado inicialmente
+            const letraElement = document.getElementById('letra');
+            if (letraElement) {
+                letraElement.textContent = '-';
+            }
+            
+            updateStatusIndicator(true);
+            checkSystemStatus();
+            
+            // Verificar status a cada 30 segundos
+            setInterval(checkSystemStatus, 30000);
+        });
+
+        // Atualiza a letra a cada 100ms
+        setInterval(atualizarLetra, 100);
+    </script>
+
+    <footer class="footer">
+        <span>Projeto em teste - Professor André Tritiack</span>
+    </footer>
+</body>
+</html> 

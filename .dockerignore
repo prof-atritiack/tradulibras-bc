@@ -1,0 +1,91 @@
+# Arquivos e diretórios a serem ignorados no build Docker
+
+# Ambiente virtual Python
+venv/
+env/
+.venv/
+.env/
+
+# Cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Arquivos de configuração local
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+*.log
+logs/
+
+# Arquivos temporários
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Documentação de desenvolvimento
+*.md
+!README.md
+
+# Arquivos de teste
+test_*.py
+*_test.py
+tests/
+
+# Arquivos de backup
+*.bak
+*.backup
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos grandes que não são necessários
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Arquivos de modelo grandes (se houver)
+*.h5
+*.pb
+*.tflite
+
+# Arquivos de dados grandes
+*.csv
+*.json
+!gestos_libras.csv
+!modelo_info.pkl
